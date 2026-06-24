@@ -6,9 +6,9 @@ lang: zh-CN
 timezone: Asia/Shanghai
 
 title: Aries Embedded' Blog
-tagline: Embedded Systems, BLE, ARM, Zephyr Notes
+tagline: Embedded Systems, FreeRTOS, BLE, ARM, Zephyr Notes
 description: >-
-  Notes on embedded systems, ARM Cortex-M, BLE, Zephyr, STM32, ESP32 and firmware development.
+  Notes on embedded systems, ARM Cortex-M, FreeRTOS, BLE, Zephyr, STM32, ESP32 and firmware development.
 
 url: "https://kkkmarch.github.io"
 baseurl: ""
