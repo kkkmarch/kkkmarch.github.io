@@ -5,7 +5,7 @@ theme: jekyll-theme-chirpy
 lang: zh-CN
 timezone: Asia/Shanghai
 
-title: Aries' Blog
+title: Aries Embedded' Blog
 tagline: Embedded Systems, BLE, ARM, Zephyr Notes
 description: >-
   Notes on embedded systems, ARM Cortex-M, BLE, Zephyr, STM32, ESP32 and firmware development.
