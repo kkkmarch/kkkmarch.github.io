@@ -10,6 +10,7 @@ order: 4
 当前重点方向包括：
 
 - ARM Cortex-M 异常、中断、启动流程与流水线
+- FreeRTOS实时系统剖析
 - BLE GAP / ATT / GATT / 广播包解析
 - Zephyr 的 west、CMake、Kconfig 与设备树
 - STM32 Bootloader、Flash 分区、串口协议与固件升级
