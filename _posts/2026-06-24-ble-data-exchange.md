@@ -30,6 +30,23 @@ tags: [ble, esp32-c3, esp-idf]
 
 _图 1：BLE GATT 层次结构手写图_
 
+上图简单展示了attribute，Characteristic，Service三者之间的关系，一个Characteristic通常由2个或者3个attribute构成，Service是由一堆Characteristic➕一个Service Declaration构成
+
+我们在了解完attribute，Characteristic，Service三者之间的关系，接着我们分析attribute的结构组成，那最权威的参考资料一定是SIG的core specification[^1] ，不过，在初学阶段直接看specification太枯燥了!这里Aries也整理好attribute的组成
+
+| 字段  | Type   | Handle    | Value | Permission   |
+|:---:|:------:| --------- | ----- | ------------ |
+| 含义  | 属性类型   | 属性句柄      | 属性值   | 属性权限         |
+| 长度  | 16 bit | 16/128bit | 不定长   | 未定义，常见为16bit |
+
+`TYPE`段是描述属性的类型，大小是128bit，其值是一个UUID，UUID是通用唯一识别码，这里用来表示属性的类型，大家如果像了解一下有哪些UUID,[那么客官请点击查阅](https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf)。回头看我们的[图一](/assets/img/posts/ble-data-exchange/whiteboard_exported_image.png)，是不是很像excel表格(不像的话 你就想象一下把)，`Handle`段就相当于excel的行号，这里就是表示该属性在属性表的哪一行，你可以把它当作一个定位符。`Value`段存储的是用户数据和描述性元数据。`Permission`段指示了属性的加密/授权所需的安全级别和读写权限
+
+  接着来看在属性之上实现的特征和服务，首先我们先来看特征，这里我们请出我们的常住嘉宾[图一](/assets/img/posts/ble-data-exchange/whiteboard_exported_image.png)，图中我们可以看出一个特征由2个必需属性特征描述符属性，特征值属性和一个可选的特征配置符属性组成，在c语言中，如果我们要去定义一个宏 我们首先得`#define`,那么C编译器在读到源文件的`#define`这个token时，它就知道后面跟得是一个宏 宏后面是替换体，替换体每次都必需要写嘛，不必然， 我们来进行一个类比，特征描述符属性就是`#define`，特征值属性就是宏，特征描述配置符属性就是替换体。这个野路子理解起来是不是很清除，下面我们来这三个属性进行剖析
+
+- 特征声明属性：该属性的UUID是`0x2803`,表明这个属性是特征声明属性，Permission是`Read Only`（别问为啥是只读，你家单元楼门牌号物业也不会闲得没事给你天天换），Value段内有细分为三个组成单元：`属性`规定了这个特征所允许的GATT操作，`UUID`是所声明特征的UUID，可不是该属性的UUID，`Handle`特征值属性的handle值
+
+[^1]:<https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Core-54/out/en/host/attribute-protocol--att-.html）>
+
 ### Attribute 与 GATT 层次结构
 
 <!-- Handle、UUID、Service → Characteristic → Descriptor -->
