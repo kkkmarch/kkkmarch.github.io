@@ -25,9 +25,9 @@ tags: [ble, esp32-c3, esp-idf]
 <!-- Server / Client 角色,Attribute、Service、Characteristic、Descriptor 的关系 -->
 - 在BLE数据交换中，通常有两个角色：服务端（Server）和客户端（Client）。服务端是拿着数据的一方，例如温湿度传感器；客户端是请求数据的一方，例如手机APP/电脑
 - Aries在大一时学习数据结构是非常迷茫的，像栈，堆，链表，队列...这些还好，他们的实现不太难理解，这里拿链表举例，一个最小的链表中包含Value，Next即可，但是Aries学到树、图等数据结构的关系和操作方式，我是真懵了。为什么要提一嘴数据结构哩 因为在BLE当中也有一个最小的数据单元->attribute，我们在BLE中所有的GATT操作的访问最小单元就是attribute，这个在我们往后的学习当中会经常见到，至于attribute的结构和作用，Aries会在下面展开讲解
-- 既然attribute是最小的数据单元，那大家就会想，在attribute之上，可以构成哪些更大的数据结构哪？答案是：Characteristic，Service
-他们之间的关系
-![BLE GATT 层次结构手写图](/assets/img/posts/ble-data-exchange/whiteboard_exported_image.png)
+- 既然attribute是最小的数据单元，那大家就会想，在attribute之上，可以构成哪些更大的数据结构哪？答案是：Characteristic，Service 下图简单展示了三者之间的关系 其中最小的数据单元就是attribute
+![BLE GATT 层次结构手写图](/assets/img/posts/ble-data-exchange/whiteboard_exported_image.png){: width="400" height="700" }
+
 _图 1：BLE GATT 层次结构手写图_
 
 ### Attribute 与 GATT 层次结构
