@@ -26,9 +26,11 @@ tags: [ble, esp32-c3, esp-idf]
 - 在 BLE 数据交换中，通常有两个角色：服务端（Server）和客户端（Client）。服务端是拿着数据的一方，例如温湿度传感器；客户端是请求数据的一方，例如手机 App/电脑
 - Aries 在大一学习数据结构时非常迷茫，像栈、堆、链表、队列这些还好，它们的实现不太难理解。这里拿链表举例，一个最小的链表中包含 Value 和 Next 即可，但是 Aries 学到树、图这些数据结构的关系和操作方式时，我是真懵了。为什么要提一嘴数据结构哩？因为在 BLE 当中也有一个最小的数据单元 -> attribute，我们在 BLE 中所有的 GATT 操作的访问最小单元就是 attribute，这个在我们往后的学习当中会经常见到。至于 attribute 的结构和作用，Aries 会在下面展开讲解
 - 既然 attribute 是最小的数据单元，那大家就会想，在 attribute 之上，可以构成哪些更大的数据结构呢？答案是：Characteristic，Service。下图简单展示了三者之间的关系，其中最小的数据单元就是 attribute
+
 ![BLE GATT 层次结构手写图](/assets/img/posts/ble-data-exchange/whiteboard_exported_image.png){: width="400" height="700" .center-img }
 
 _图 1：BLE GATT 层次结构手写图_
+{: .image-caption }
 
 上图简单展示了 attribute，Characteristic，Service 三者之间的关系，一个 Characteristic 通常由 2 个或者 3 个 attribute 构成，Service 是由一堆 Characteristic 加一个 Service Declaration 构成。
 我们在了解完 attribute，Characteristic，Service 三者之间的关系后，接着来分析 attribute 的结构组成。最权威的参考资料一定是 SIG 的 Core Specification[^1]，不过，在初学阶段直接看 Core Specification 太枯燥了！这里 Aries 也整理好了 attribute 的组成
@@ -40,13 +42,19 @@ _图 1：BLE GATT 层次结构手写图_
 
 `TYPE` 段描述属性的类型，大小是 128 bit，其值是一个 UUID。UUID 是通用唯一识别码，这里用来表示属性的类型。大家如果想了解有哪些 UUID，[那么客官请点击查阅](https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf)。回头看我们的[图一](/assets/img/posts/ble-data-exchange/whiteboard_exported_image.png)，是不是很像 Excel 表格（不像的话，你就想象一下吧），`Handle` 段就相当于 Excel 的行号，这里表示该属性在属性表的哪一行，你可以把它当作一个定位符。`Value` 段存储的是用户数据和描述性元数据。`Permission` 段指示了属性的加密/授权所需的安全级别和读写权限
 
-  接着来看在属性之上实现的特征和服务。首先我们先看特征，这里请出我们的常住嘉宾[图一](/assets/img/posts/ble-data-exchange/whiteboard_exported_image.png)。图中可以看出，一个特征由 2 个必需属性（特征描述符属性、特征值属性）和一个可选的特征配置符属性组成。在 C 语言中，如果我们要定义一个宏，首先得写 `#define`，那么 C 编译器在读到源文件的 `#define` 这个 token 时，就知道后面跟的是一个宏，宏后面是替换体。替换体每次都必须要写吗？不必然。我们来做一个类比：特征描述符属性就是 `#define`，特征值属性就是宏，特征描述配置符属性就是替换体。这个野路子理解起来是不是很清晰[旺柴]，下面我们来对这三个属性进行剖析
-
-- 特征声明属性：该属性的 UUID 是 `0x2803`，表明这个属性是特征声明属性。Permission 是 `Read Only`（别问为啥是只读，你家单元楼门牌号物业也不会闲得没事给你天天换），Value 段内细分为三个组成单元：**`属性`** 规定了这个特征所允许的 GATT 操作，**`UUID`** 是所声明特征的 UUID，可不是该属性的 UUID，**`Handle`** 是特征值属性的 handle 值
-
 ### Attribute 与 GATT 层次结构
 
 <!-- Handle、UUID、Service → Characteristic → Descriptor -->
+接着来看在属性之上实现的特征和服务。首先我们先看特征，这里请出我们的常住嘉宾[图一](/assets/img/posts/ble-data-exchange/whiteboard_exported_image.png)。图中可以看出，一个特征由 2 个必需属性（特征描述符属性、特征值属性）和一个可选的特征配置符属性组成。在 C 语言中，如果我们要定义一个宏，首先得写 `#define`，那么 C 编译器在读到源文件的 `#define` 这个 token 时，就知道后面跟的是一个宏，宏后面是替换体。替换体每次都必须要写吗？不必然。我们来做一个类比：特征描述符属性就是 `#define`，特征值属性就是宏，特征描述配置符属性就是替换体。这个野路子理解起来是不是很清晰[旺柴]，下面我们来对这三个属性进行剖析
+
+- 特征声明属性：该属性的 UUID 是 `0x2803`，表明这个属性是特征声明属性。Permission 是 `Read Only`（别问为啥是只读，你家单元楼门牌号物业也不会闲得没事给你天天换），Value 段内细分为三个组成单元：**`属性`** 规定了这个特征所允许的 GATT 操作，**`UUID`** 是所声明特征的 UUID，可不是该属性的 UUID，**`Handle`** 是特征值属性的 handle 值
+- 特征值属性：该属性的 UUID 就是特征声明中所声明的那个 UUID，Handle就是特征声明中所声明的 Handle, Permission 是 `Read / Write`，Value 段内存储的是用户数据
+- 特征描述符属性：该属性的Permission是any， UUID 由描述符类型决定，其实大致上可以分为两类，CustomUser Description（用户自定义描述符) ,GATT定义的描述符（如CCCD、SCCD等），这里我们用最常见的CCCD来展开学习，CCCD是客户端特征配置描述符，其UUID是`0x2902`, GATT服务器上的某个特征支持服务器发起的GATT操作，那么客户端就可以通过写该属性的Value段使能或禁止该操作，下面的表格给出了CCCD的Value段各bit的含义：
+
+| UUID   | Permission   | Value 位  | 含义          |
+| ------ | ------------ | --------- | ------------- |
+| 0x2902 | Write & Read | bit0      | 启用/禁止通知 |
+|        |              | bit1      | 启用/禁止指示 |
 
 ## 数据交换的四种操作
 
