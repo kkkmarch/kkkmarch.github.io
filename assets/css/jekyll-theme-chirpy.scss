@@ -205,6 +205,13 @@ main {
     margin-left: auto;
 }
 
+.content .image-caption {
+    margin-top: -0.75rem;
+    text-align: center;
+    color: var(--text-muted-color);
+    font-size: 0.9rem;
+}
+
 .highlight,
 div[class^='language-'] {
     border-radius: 0.75rem;
